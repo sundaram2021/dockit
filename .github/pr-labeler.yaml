@@ -1,0 +1,12 @@
+feature:
+  - '(feat|feature).*'
+bugfix:
+  - '(fix|bugfix).*'
+documentation:
+  - '(docs|documentation).*'
+chore:
+  - '(chore|maintenance).*'
+refactor:
+  - '(refactor|improvement).*'
+testing:
+  - '(test|testing).*'

@@ -1,0 +1,97 @@
+name: Dockit CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.23.2'
+        cache: false
+
+    - name: Install Dependencies
+      run: go mod download
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Test
+      run: go test -v ./...
+
+  commit-message-check:
+    name: Commit Message Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gsactions/commit-message-checker@v2
+        with:
+          pattern: '^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?:.+'
+          flags: 'gmu'
+          error: 'Commit message does not follow conventional commits standard'
+
+  welcome-first-time-contributor:
+    name: Welcome First Time Contributor
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: |
+            👋 Thank you for creating your first issue in our repository! 
+            
+            A few guidelines to help you get started:
+            - Please provide as much detail as possible about the issue
+            - Include steps to reproduce if it's a bug
+            - Attach screenshots or error logs if applicable
+            
+            Our maintainers will review your issue soon. We appreciate your contribution!
+
+          pr-message: |
+            🎉 Congratulations on your first pull request! 
+            
+            Thank you for helping improve our project. Please ensure:
+            - Your PR description clearly explains the changes
+            - Include the motivation behind the PR
+            - Add tests if applicable
+            
+            Our team will review your PR as soon as possible. Great job!
+
+  pr-labeler:
+    name: PR Labeler
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/labeler@v5
+        with:
+          configuration-path: .github/pr-labeler.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.2'
+      
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
