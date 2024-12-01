@@ -31,16 +31,6 @@ jobs:
     - name: Test
       run: go test -v ./...
 
-  commit-message-check:
-    name: Commit Message Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: gsactions/commit-message-checker@v2
-        with:
-          pattern: '^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?:.+'
-          flags: 'gmu'
-          error: 'Commit message does not follow conventional commits standard'
 
   welcome-first-time-contributor:
     name: Welcome First Time Contributor
